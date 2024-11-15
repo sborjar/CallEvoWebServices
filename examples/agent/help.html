@@ -1,0 +1,330 @@
+<div id="buttons">
+    <select id="dropDownLines" class="col-2"></select>
+    <button id="INFOCALL" class="btmhelp btn btn-primary" title="INFOCALL">INFOCALL</button>
+    <button id="HOLD" class="btmhelp btn btn-info" title="HOLD">HOLD</button>
+    <button id="RETRIEVE" class="btmhelp btn btn-warning" title="RETRIEVE">RETRIEVE</button>
+    <button id="GOTOLINE" class="btmhelp btn btn-primary" title="GOTOLINE">GOTOLINE</button>
+    <button id="HANGUP" class="btmhelp btn btn-info" title="HANGUP">HANGUP</button>
+    <button id="COMPLETECALLER" class="btmhelp btn btn-warning" title="COMPLETECALLER">COMP CALLER</button>
+    <select id="status" class="col-2">
+        <option value="READY">READY</option>
+        <option value="NOTREADY">NOTREADY</option>
+        <option value="WRAP">WRAP</option>
+    </select>
+    <button id="SETDISPHANG" class="btmhelp btn btn-warning" title="SETDISPHANG">SETDISPHANG</button>
+    <button id="SETDISPHANGALL" class="btmhelp btn btn-danger" title="SETDISPHANGALL">SETDISPHANGALL</button>
+    <button id="SETSTATUS" class="btmhelp btn btn-success" title="SETSTATUS">SET STATUS</button>
+    <button id="BRIDGE" class="btmhelp btn btn-primary" title="BRIDGE">BRIDGE</button>
+    <button id="CONF" class="btmhelp btn btn-info" title="CONF">CONF</button>
+    <button id="TRANSFER" class="btmhelp btn btn-warning btn-block m-1">TRANSFER</button>
+    <button id="STARTRECORDING" class="btmhelp btn btn-success">START REC</button>
+    <button id="STOPRECORDING" class="btmhelp btn btn-danger">STOP REC</button>
+    <button id="PREVIEWCALL" class="btmhelp btn btn-primary btn-block m-1">PREVIEWCALL</button>
+    <button id="CHECKSCRIPT" class="btmhelp btn btn-primary btn-block m-1">CHECKSCRIPT</button>
+    <button id="CLOSEDIV" class="btmhelp btn btn-danger btn-block m-1"><i class="bi bi-x"></i></button>
+</div>
+
+
+<script>
+    funcBuildCallData();
+    function funcBuildCallData() {
+        let htmlDrop = "";
+
+        // for (let i = 1; i <= cws.numberLines; i++) {
+        for (let i = 1; i <= 100; i++) {
+            htmlDrop = `${htmlDrop}
+                    <option value="${i}">Line ${i}</option>
+                `;
+        }
+        $("#dropDownLines").html(htmlDrop);
+    };
+
+    $(".btmhelp").on("click", function (event) {
+        let line = $("#dropDownLines option:selected").val();
+        let idbtm = $(this).attr("id");
+        let newstatus = $("#status option:selected").val();
+        let e = null;
+        let rec;
+        let agent_code = `Agent/${cws.user.agent_code}`;
+        let callid = `ip-172-30-6-42.ec2.internal-1645399206.247${line}`;
+        let scripts = [54, 41, 36, 38, 40, 39, 28, 5, 43, 24, 29, 26, 21, 45, 35, 47, 17];
+        let nameRandom = Math.random().toString(20).slice(2).toUpperCase() + " " + Math.random().toString(36).slice(2).toUpperCase();
+        switch (idbtm) {
+            case "CLOSEDIV":
+                $("#divOnlyForTest").addClass("hide");
+                break;
+            case "INFOCALL":
+                rec = {
+                    type: 'message',
+                    data: {
+                        "callid": callid,
+                        "queuename": "apqu981b8504c04f8d4a835",
+                        "agent": agent_code,
+                        "eventime": "2022-02-20 23:20:06.531204",
+                        "data": JSON.stringify(
+                            {
+                                "cid": parseInt(`71${line}`),
+                                "campName": "fountain" + line + "_outbound",
+                                "phone": `44293788${line}`,
+                                "callid": parseInt(`527812${line}`),
+                                "leadid": parseInt(`75446${line}`),
+                                "TLead": `<strong>${nameRandom}</strong><br>NY, Alone Street, Home #${line}`,
+                                "sdisp": "n",
+                                "fdisp": "n",
+                                "ddisp": "0",
+                                "type": "C",
+                                "url": "https://remotep.callevo.net/aws_survey?id=" + scripts[line],
+                                "allowConf": 1,
+                                "linked": "ip-172-30-6-42.ec2.internal-1645399206.247",
+                                "actionid": "Santiago"
+                            }
+                        ),
+                        "servername": "ip-172-30-6-42.ec2.internal",
+                        "serverip": "172.30.6.42",
+                        "event": "INFOCALL"
+                    }
+                };
+                cws.onMessageListener(rec);
+                return;
+                break;
+            case "HOLD":
+                rec = {
+                    type: 'message',
+                    data: {
+                        "eventtime": "2022-02-21 21:12:21",
+                        "event": "HOLD",
+                        "callid": callid,
+                        "queuename": `apq${agent_code}`,
+                        "agent": agent_code,
+                        "data": "1",
+                        "result": "success",
+                        "servername": "172.30.6.42",
+                        "serverip": "172.30.6.42"
+                    }
+                };
+                cws.onMessageListener(rec);
+                break;
+            case "RETRIEVE":
+                rec = {
+                    type: 'message',
+                    data: {
+                        "eventtime": "2022-02-21 21:12:21",
+                        "event": "RETRIEVE",
+                        "callid": callid,
+                        "queuename": `apq${agent_code}`,
+                        "agent": agent_code,
+                        "data": "1",
+                        "servername": "172.30.6.42",
+                        "serverip": "172.30.6.42"
+                    }
+                };
+                cws.onMessageListener(rec);
+                break;
+                // cws.changeCallStatus(callid, cws.TALKING);
+                break;
+            case "GOTOLINE":
+                rec = {
+                    type: 'message',
+                    data: {
+                        "eventtime": "2022-02-21 21:12:21",
+                        "event": "GOTOLINE",
+                        "callid": callid,
+                        "queuename": `apq${agent_code}`,
+                        "agent": agent_code,
+                        "data": line,
+                        "servername": "172.30.6.42",
+                        "serverip": "172.30.6.42"
+                    }
+                };
+                cws.onMessageListener(rec);
+                break;
+            case "HANGUP":
+                rec = {
+                    type: 'message',
+                    data: {
+                        "eventtime": "2022-02-21 21:12:21",
+                        "event": "HANGUP",
+                        "callid": callid,
+                        "queuename": `apq${agent_code}`,
+                        "agent": agent_code,
+                        "data": "1|13|1",
+                        "servername": "172.30.6.42",
+                        "serverip": "172.30.6.42"
+                    }
+                };
+                cws.onMessageListener(rec);
+                break;
+            case "CALLBACK":
+                cws.getCallBackData();
+                break;
+            case "COMPLETECALLER":
+                rec = {
+                    type: 'message',
+                    data: {
+                        "eventtime": "2022-02-21 21:12:21",
+                        "event": "COMPLETECALLER",
+                        "callid": callid,
+                        "queuename": `apq${agent_code}`,
+                        "agent": agent_code,
+                        "data": "1|13|1",
+                        "servername": "172.30.6.42",
+                        "serverip": "172.30.6.42"
+                    }
+                };
+                cws.onMessageListener(rec);
+                break;
+            case "SETDISPHANG":
+                rec = {
+                    type: 'message',
+                    data: {
+                        "eventtime": "2022-02-21 21:12:21",
+                        "event": "SETDISPHANG",
+                        "callid": callid,
+                        "queuename": `apq${agent_code}`,
+                        "agent": agent_code,
+                        "data": `AMM|${newstatus}`,
+                        "servername": "172.30.6.42",
+                        "serverip": "172.30.6.42"
+                    }
+                };
+                cws.onMessageListener(rec);
+                break;
+            case "SETDISPHANGALL":
+                rec = {
+                    type: 'message',
+                    data: {
+                        "eventtime": "2022-02-21 21:12:21",
+                        "event": "SETDISPHANGALL",
+                        "callid": callid,
+                        "queuename": `apq${agent_code}`,
+                        "agent": agent_code,
+                        "data": `AMM|${newstatus}`,
+                        "servername": "172.30.6.42",
+                        "serverip": "172.30.6.42"
+                    }
+                };
+                cws.onMessageListener(rec);
+                break;
+            case "SETSTATUS":
+                rec = {
+                    type: 'message',
+                    data: {
+                        "eventtime": "2022-02-21 21:12:21",
+                        "event": "SETSTATUS",
+                        "callid": callid,
+                        "queuename": `apq${agent_code}`,
+                        "agent": agent_code,
+                        "data": newstatus,
+                        "servername": "172.30.6.42",
+                        "serverip": "172.30.6.42"
+                    }
+                };
+                cws.onMessageListener(rec);
+                break;
+            case "STARTRECORDING":
+                rec = {
+                    type: 'message',
+                    data: {
+                        "callid": callid,
+                        "queuename": `apq${agent_code}`,
+                        "agent": agent_code,
+                        "eventime": "2022-02-20 23:20:06.531204",
+                        "data": "",
+                        "servername": "ip-172-30-6-42.ec2.internal",
+                        "serverip": "172.30.6.42",
+                        "event": "STARTRECORDING",
+                    }
+                };
+                cws.onMessageListener(rec);
+                break;
+            case "STOPRECORDING":
+                rec = {
+                    type: 'message',
+                    data: {
+                        "callid": callid,
+                        "queuename": `apq${agent_code}`,
+                        "agent": agent_code,
+                        "eventime": "2022-02-20 23:20:06.531204",
+                        "data": "",
+                        "servername": "ip-172-30-6-42.ec2.internal",
+                        "serverip": "172.30.6.42",
+                        "event": "STOPRECORDING",
+                    }
+                };
+                cws.onMessageListener(rec);
+                break;
+
+            case "PREVIEWCALL":
+                rec = {
+                    type: 'message',
+                    data: {
+                        "callid": "ip-172-30-6-42.ec2.internal-1645399206.2478",
+                        "queuename": "apqu981b8504c04f8d4a835",
+                        "agent": "Agent/u981b8504c04f8d4a835",
+                        "eventime": "2022-02-20 23:20:06.531204",
+                        "data": "35|654321|0995918919",
+                        "servername": "ip-172-30-6-42.ec2.internal",
+                        "serverip": "172.30.6.42",
+                        "event": "PREVIEWCALL",
+                    }
+                };
+                cws.onMessageListener(rec);
+                return;
+                break;
+            case "CHECKSCRIPT":
+                console.log(cws.checkScriptUrl(1));
+                break;
+            case "MANUAL":
+                let params = {
+                    camp_id: 11,
+                    phone: "7201234567",
+                    type: "phone",
+                    leadId: 0,
+                };
+                cws.onSend('OUTCALL', params);
+                return;
+                break;
+            case "BRIDGE":
+                cws.funcBridge();
+                // rec = {
+                //     type: 'message',
+                //     data: {
+                //         "callid": callid,
+                //         "queuename": "apqu981b8504c04f8d4a835",
+                //         "agent": "Agent/u981b8504c04f8d4a835",
+                //         "eventime": "2022-02-20 23:20:06.531204",
+                //         "data": "",
+                //         "result": "OK",
+                //         "servername": "ip-172-30-6-42.ec2.internal",
+                //         "serverip": "172.30.6.42",
+                //         "action": "BRIDGE",
+                //     }
+                // };
+                // cws.onMessageListener(rec);
+                break;
+            case "CONF":
+                cws.funcConference();
+                // rec = {
+                //     type: 'message',
+                //     data: {
+                //         "callid": callid,
+                //         "queuename": "apqu981b8504c04f8d4a835",
+                //         "agent": "Agent/u981b8504c04f8d4a835",
+                //         "eventime": "2022-02-20 23:20:06.531204",
+                //         "data": "2|3",
+                //         "result": "OK",
+                //         "servername": "ip-172-30-6-42.ec2.internal",
+                //         "serverip": "172.30.6.42",
+                //         "event": "ENTERCONF",
+                //     }
+                // };
+                // cws.onMessageListener(rec);
+                break;
+            case "TRANSFER":
+                funcTransf();
+                break;
+        }
+        myListener(e);
+    });
+
+</script>

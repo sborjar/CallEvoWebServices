@@ -1,0 +1,14 @@
+AGENT
+=====
+v1.00A - cws.js - New version 
+v1.01A - cws.1.01.js - Bug Fixes
+v1.02A - cws.1.02.js - Changes with Multiple Lines
+v1.03A - cws.1.03.js - Add NUMTRANSFER and less manage costumer object
+v1.04A - Fix some problems with OUTCALL and set agent status to dynamic, change buttons for disabled/enabled actions
+v1.05A - Fix a bug in disphangall
+v1.06A - Fix add new two-step login mode and send required fields, added information about callinfo in SELECTROW event.
+v2.0A(latest) - New version. Includes NATS support, removes ws.
+
+CLICKER
+=======
+v1.00A(latest) - cwscl.latest.js - New version 

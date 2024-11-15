@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="robots" CONTENT="noindex">
+  <meta name="googlebot" CONTENT="noindex">
+  <meta http-equiv="Expires" content="0">
+  <meta http-equiv="Last-Modified" content="0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, mustrevalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <title>Callevo Agent</title>
+
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+  <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+    integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js"
+    integrity="sha512-42PE0rd+wZ2hNXftlM78BSehIGzezNeQuzihiBCvUEB3CVxHvsShF86wBWwQORNxNINlBPuq7rG4WWhNiTVHFg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script type="text/javascript" src="https://assets.callevo.net/js-core/adapter.min.js"></script>
+  <script type="text/javascript" src="https://assets.callevo.net/js-core/md5.min.js"></script>
+  <script src="https://assets.callevo.net/core/webrtc.stable.js" type="text/javascript"></script>
+
+  <script src="http://localhost/callevo/core/cws.latest.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="http://localhost/callevo/agentdev/styles.scss">
+
+  <style>
+    .tr-selected {
+      background-color: rgb(255, 255, 239);
+    }
+
+    .hide {
+      display: none;
+    }
+
+    iframe {
+      height: 98vh;
+      width: 100%;
+    }
+
+    .scriptPage {
+      background-color: #70fafa;
+    }
+  </style>
+</head>
+
+<body class="conta">
+  <div class="ctoolbar">
+    <img src="//assets.callevo.net/images/logo.png" class="p-3">
+    <br>
+    <button class="btn btn-link text-white t30" id="btmProfile" title="Profile">
+      <i class="bi bi-person-bounding-box t30"></i>
+    </button>
+    <button class="btn btn-link text-white t30" id="btmSwap" title="Swap Tenant">
+      <i class="bi bi-arrow-left-right"></i>
+    </button>
+    <br>
+    WebRTC
+    <i id="webrtc_ligth" class="bi bi-plugin text-danger t30" title="OFF"></i>
+    <br>
+    Phone
+    <i id="phone_ligth" class="bi bi-plugin text-danger t30" title="OFF"></i>
+    <br>
+    Pepper
+    <i id="pepper_ligth" class="bi bi-plugin text-danger t30" title="OFF"></i>
+    <br>
+    <button class="btn btn-link text-info t30" id="btmLOGOFF" title="Power Off">
+      <i class="bi bi-power"></i>
+    </button>
+  </div>
+  <div class="cmenu">
+    <span>
+      <h4 id="support">CallEvo Inc.<br>Agent Demo</h4>
+    </span>
+    <label for="">Status</label>
+    <select id="status_agent"></select>
+
+    <table id="tblCallData" class="table table-stripedxxx table-borderedxx t20" cellspacing="0">
+      <thead>
+        <tr>
+          <th title="Line" width="5%" class="text-center">Ln</th>
+          <th>Phone</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th id="recording_header" class="hide"></th>
+          <th class="hide">UniqueID</th>
+        </tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+    <label>Connection ID</label>
+    <span id="connectionid"></span>
+
+    <br>
+    <!-- <textarea id="response" class="form-control " rows="10"></textarea> -->
+  </div>
+  <div class="cbody">
+    <div id="divOnlyForTest" class="hide"></div>
+    <div id="question" class="hide"></div>
+    <div id="callinfo" class="hide"></div>
+    <div id="divScript"></div>
+  </div>
+
+  <div class="cbtms">
+    <label class="mt-2 mb-2">Actions</label>
+    <button class="btn btn-primary m-1 btn-sm" id="btmMANUALCALL"><i class="fas fa-phone"></i><br> Manual Calls</button>
+    <button class="btn btn-primary m-1 btn-sm" id="btmHOLD"><i class="fas fa-pause"></i><br> Hold</button>
+    <button class="btn btn-primary m-1 btn-sm" id="btmRETRIEVE"><i class="fas fa-play"></i><br> Retrieve</button>
+    <button class="btn btn-primary m-1 btn-sm" id="btmTRANSFER"><i class="fas fa-random"></i><br>Transfer</button>
+    <button class="btn btn-primary m-1 btn-sm" id="btmSENDDTMF"><i class="fas fa-tty"></i><br>Send DTMF</button>
+    <button class="btn btn-primary m-1 btn-sm" id="btmBRIDGE"><i class="fas fa-people-arrows"></i><br>Bridge</button>
+    <button class="btn btn-primary m-1 btn-sm" id="btmCONF"><i class="fas fa-users"></i><br>Conference</button>
+    <button class="btn btn-primary m-1 btn-sm" id="btmDISCONNECT"><i class="fas fa-users-slash"></i><br>Disconnect</button>
+    <button class="btn btn-primary m-1 btn-sm" id="btmBREAKCONFERENCE"><i class="fas fa-recycle"></i><br>Break Conf</button>
+    <button class="btn btn-primary m-1 btn-sm" id="btmRECALL"><i class="fas fa-phone-volume"></i><br>Recall</button>
+    <button class="btn btn-primary m-1 btn-sm" id="btmHANGUP"><i class="fas fa-phone-slash"></i><br>Hangup</button>
+  </div>
+  <script>
+    let pathLocal = "http://localhost/callevo/agentdev/";
+
+    goToLogIn = () => {
+      sessionStorage.setItem("statusLogged", "false");
+      var miRedirect = document.createElement('a');
+      miRedirect.setAttribute('href', pathLocal);
+      miRedirect.setAttribute('target', '_self');
+      miRedirect.click();
+    }
+
+    logged = sessionStorage.getItem("statusLogged");
+    if (logged == "false" || logged == null || logged == undefined) {
+      goToLogIn();
+    }
+    let globalData = JSON.parse(sessionStorage.getItem("user-data"));
+    let globalLstTenants = JSON.parse(sessionStorage.getItem("list-tenants"));
+    let globalCamps = sessionStorage.getItem("campaigns_register");
+    let dialback = JSON.parse(sessionStorage.getItem("settingsDialBack"));
+    if (globalData == null) {
+      window.location.href = pathLocal;
+    }
+
+    let cws = new CallEvoWebServices();
+
+    cws.keepalive = true;
+    cws.debug = true;
+    cws.numberLines = 0;
+    cws.test = false;
+
+    cws.addEventListener(myListener);
+    let audit_settingsInit = cws.settingsInit(globalData);
+    let audit_settingDialBack = cws.settingDialBack(dialback);
+    addScripts(true);
+
+    let connectionID = "";
+    let pepper_status = false;
+    let current_status = "NOTREADY";
+    let onLogOff = false;
+    let callInfo = [];
+    let previewcall;
+    let html = "";
+    let lstCallBack = [];
+    let transferCmpData = [];
+    let transferAgentData = [];
+
+    if (!cws.test) {
+      cws.login(globalCamps)
+        .then(resp => {
+          if (resp
+            && resp.status == cws.OK
+            && audit_settingsInit
+            && audit_settingDialBack
+          ) {
+            cws.conn();
+          }
+        })
+        .catch(err => {
+          log("error", err);
+        });
+    }
+
+    function addScripts(createAll = true) {
+      let html = "";
+      if (createAll) {
+        $("#divScript").html("");
+        for (let i = 1; i <= cws.numberLines; i++) {
+          html = `${html} <iframe id="script${i}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"  class="scriptPage hide" scrolling="auto" allowfullscreen frameborder="0"></iframe>`;
+        }
+        $("#divScript").html(html);
+      } else {
+        let id = cws.numberLines;
+        html = `${html} <iframe id="script${id}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"  class="scriptPage hide" scrolling="auto" allowfullscreen frameborder="0"></iframe>`;
+        $("#divScript").append(html);
+      }
+    }
+
+    function myListener(e) {
+      if (!e) {
+        return;
+      }
+      // if (cws.debug) console.log(e)
+      switch (e.event) {
+        case cws.ACTIONBUTTONS:
+          e.buttons.forEach(btns => {
+            if (e.action == cws.DISABLED) {
+              $(`#btm${btns.name}`).attr("disabled", btns.value);
+            } else if (e.action == cws.VISIBLE) {
+              let val = btns.value ? "display: inline" : "display: none";
+              let obj = `$("#btm${btns.name}").prop("style", "${val}");`
+              eval(obj);
+            }
+          });
+          break;
+        case cws.AGENTLOGOFF:
+          goToLogIn();
+          break;
+        case cws.AGENTLOGINTIMEOUT:
+          log("info", e.message);
+          goToLogIn();
+          break;
+        case cws.CANCHANGEAGENTSTATUS:
+          $("#status_agent").attr("disabled", e.disabled)
+          break;
+        case cws.CALLBACK:
+          lstCallBack = e.result;
+          if (lstCallBack.length == 0) {
+            $("#question").addClass("hide");
+            return;
+          }
+          let cbhtml = `
+            <div class="text-center">
+              <h4>Call Back</h4>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Action</th>
+                    <th>Date</th>
+                    <th>Phone</th>
+                    <th>Campaign</th>
+                  </tr>
+                </thead>
+                <tbody>
+          `;
+
+          lstCallBack.forEach(cb => {
+            cbhtml = `${cbhtml}
+                  <tr>
+                    <td width="1%">
+                      <label class="form-radio-label">
+                        <input class="form-radio-input" type="radio" id="optCallBack" value="${cb.id}">
+                        <span class="form-radio-sign"></span>
+                      </label>
+                    </td>
+                    <td>${cb.date}</td>
+                    <td>${cb.phone}</td>
+                    <td>${cb.campaign}</td>
+                  </tr>
+            `;
+          });
+
+          cbhtml = `${cbhtml}
+                </tdbody>
+              </table>
+              <button id="btmCBCall" class="btn btn-success m-1">Call</button>
+              <button id="btmCBCancel" class="btn btn-danger m-1">Cancel</button>
+            </div>
+          `;
+          $("#question").html(cbhtml);
+          $("#question").removeClass("hide");
+          break;
+        case cws.CALLDATA:
+          if (e.result && e.result.length > 0) {
+            if (e.operation == cws.NEW) {
+              let idxnew = e.result[e.result.length - 1].id;
+              let htmlnew = `
+                <tr id="line${idxnew}">
+                    <td class="text-center"><b>${idxnew}</b></td>
+                    <td id="line${idxnew}_phone" class="text-start"></td>
+                    <td id="line${idxnew}_time" class="text-center"></td>
+                    <td id="line${idxnew}_status" class="text-start"></td>
+                    <td id="line${idxnew}_recording" class="hide"><i class="fas fa-microphone-alt mr-2 text-danger"></i></td>
+                    <td id="line${idxnew}_uniqueid" class="text-start hide"></td>
+                    <td id="line${idxnew}_url" class="text-start hide"></td>
+                </tr>`;
+              $("#tblBody").append(htmlnew);
+              addScripts(false);
+            } else if (e.operation == cws.CLEAR) {
+              let html = "";
+              let i = 0;
+              e.result.forEach((e, idx) => {
+                i = idx + 1;
+                html = `${html}
+                  <tr id="line${i}">
+                      <td class="text-center"><b>${i}</b></td>
+                      <td id="line${i}_phone" class="text-start"></td>
+                      <td id="line${i}_time" class="text-center"></td>
+                      <td id="line${i}_status" class="text-start"></td>
+                      <td id="line${i}_recording" class="hide"><i class="fas fa-microphone-alt mr-2 text-danger"></i></td>
+                      <td id="line${i}_uniqueid" class="text-start hide"></td>
+                      <td id="line${i}_url" class="text-start hide"></td>
+                  </tr>`;
+                $(`#script${i}`).addClass("hide");
+                $("#callinfo").addClass("hide");
+              })
+              $("#tblBody").html(html);
+              addScripts(true);
+              // $("#divScript").html("");
+            }
+
+            e.result.forEach(ele => {
+              $(`#line${ele.id}_phone`).html(ele.phone);
+              $(`#line${ele.id}_time`).html(ele.time);
+              $(`#line${ele.id}_status`).html(ele.callstatus);
+              $(`#line${ele.id}_uniqueid`).html(ele.uniqueid);
+              $(`#line${ele.id}_url`).html(ele.url);
+
+              if (ele.phone == "") {
+                $(`#script${ele.id}`).addClass("hide");
+                $(`#script${ele.id}`).attr("src", "");
+              } else {
+                if (ele.id == cws.actual_line) {
+                  $(`#script${ele.id}`).removeClass("hide");
+                } else {
+                  $(`#script${ele.id}`).addClass("hide");
+                }
+              }
+            });
+          }
+          break;
+        case cws.IDCONNECTION:
+          connectionID = e.connectionid
+          if (connectionID != "") {
+            $("#connectionid").html(connectionID);
+          }
+          break;
+        case cws.KICKAGENT:
+          log("You have been kick");
+          goToLogIn();
+          break;
+        case cws.LOG:
+          log(e.type, e.message);
+          break;
+        case cws.LOGOFF:
+          goToLogIn();
+          break;
+        case cws.PREVIEWCALL:
+          previewcall = e;
+          let phone = e.phone;
+          html = `
+              <div class="text-center">
+                  <h4>Preview Call</h4>
+                  <h1>${phone}</h1>
+                  <button id="btmPreviewCall" class="btn btn-success m-1">Call</button>
+                  <button id="btmPreviewCancel" class="btn btn-danger m-1">Cancel</button>
+                  <button id="btmPreviewSkip" class="btn btn-warning m-1">Skip</button>
+              </div>
+          `;
+          $("#question").html(html);
+          $("#question").removeClass("hide");
+
+          $("#btmPreviewCall").on("click", function () {
+            $("#question").addClass("hide");
+            previewcall.option = cws.CONFIRM;
+            cws.sendPreviewCallResults(previewcall);
+          });
+          $("#btmPreviewCancel").on("click", function () {
+            $("#question").addClass("hide");
+            previewcall.option = cws.CANCEL;
+            cws.sendPreviewCallResults(previewcall);
+          });
+          $("#btmPreviewSkip").on("click", function () {
+            $("#question").addClass("hide");
+            previewcall.option = cws.SKIP;
+            cws.sendPreviewCallResults(previewcall);
+          });
+          break;
+        case cws.PHONEMSG:
+          // $("#phone_ligth").html(e.result == cws.ON ? cws.ON : cws.OFF);
+          $("#phone_ligth").removeClass("text-danger");
+          switch (e.result) {
+            case cws.ON:
+              $("#phone_ligth").addClass("text-info");
+              break;
+            case cws.OFF:
+              $("#phone_ligth").addClass("text-danger");
+              break;
+            case cws.ERROR:
+              $("#phone_ligth").addClass("text-danger");
+              log(e.type, e.message);
+              break;
+          }
+          break;
+        case cws.SELECTROW:
+          $("#tblCallData .tr-selected").toggleClass("tr-selected");
+          $("#line" + e.row).addClass("tr-selected");
+          $("#actualline").html(e.row);
+
+          /** HIDE ALL SCRIPTS */
+          for (let i = 0; i < cws.numberLines; i++) {
+            $(`#script${i}`).addClass("hide");
+          }
+
+          /** VERIFY IF THE SCRIPT IF LOADED*/
+          let verify_url = $(`#script${e.row}`).attr("src");
+          if (verify_url == undefined || verify_url == '') {
+            if (e.url != "") {
+              $(`#script${e.row}`).attr("src", e.url);
+            }
+          }
+          /** SHOW CURRENT SCRIPT */
+          if (e.url != "") {
+            $(`#script${e.row}`).removeClass("hide");
+          }
+
+          if (e.callInfo!=''){
+            $("#callinfo").removeClass("hide");
+            $("#callinfo").html(e.callinfo);
+          }else{
+            $("#callinfo").html("");
+            $("#callinfo").addClass("hide");
+          }
+          break;
+        case cws.STARTRECORDING:
+          $(`#recording_header`).removeClass("hide");
+          $(`#line${e.id}_recording`).removeClass("hide");
+          break;
+        case cws.STOPRECORDING:
+          $(`#recording_header`).addClass("hide");
+          $(`#line${e.id}_recording`).addClass("hide");
+          break;
+        case cws.SETSTATUS:
+          let htmlopt = "";
+          e.list_status.forEach(st => {
+            htmlopt = `${htmlopt}<option value='${st}' ${st == e.status ? 'selected' : ''}>${st}</option>`;
+          });
+          $("#status_agent").html(htmlopt);
+          break;
+        case cws.WEBSOCKET:
+          $("#pepper_ligth").removeClass("text-danger");
+          switch (e.result) {
+            case cws.ON:
+              // $("#pepper_ligth").html(e.result);
+              pepper_status = e.result == cws.ON ? true : false;
+              log("√", "WS Connected");
+              $("#pepper_ligth").addClass("text-info");
+              break;
+            case cws.CLOSE:
+            case cws.OFF:
+            case cws.ERROR:
+              $("#pepper_ligth").html(e.result);
+              $("#pepper_ligth").addClass("text-danger");
+              pepper_status = false;
+              log("x", `WS Disconnected, Reason: ${e.reason}`);
+              if (onLogOff) goToLogIn();
+              break;
+          }
+          break;
+        case cws.WEBRTCMSG:
+          // $("#webrtc_ligth").html(e.result == cws.ON ? cws.ON : cws.OFF);
+          $("#webrtc_ligth").removeClass("text-danger");
+          switch (e.result) {
+            case cws.ON:
+              $("#webrtc_ligth").addClass("text-info");
+              break;
+            case cws.OFF:
+              $("#webrtc_ligth").addClass("text-danger");
+              break;
+            case cws.ERROR:
+              $("#webrtc_ligth").addClass("text-danger");
+              log(e.type, e.message);
+              break;
+          }
+          break;
+      }
+    }
+
+    function log(type = "info", logText = "", printScreen = true) {
+      type = type.toLocaleUpperCase();
+      if (type == "INFO") {
+        type = "≡";
+      } else if (type == "ERROR") {
+        type = "x";
+      }
+      let date = moment().format('YYYY-MM-DD hh:mm:ss');
+      let text = date + " [" + type + "] " + logText;
+      console.log(text);
+      $("#response").val($("#response").val() + text + "\n");
+      if (type == "ERROR") {
+      }
+    }
+
+    $("#status_agent").on("change", function () {
+      let newstatus = $(this).val();
+      cws.onSend(cws.SETSTATUS, { status: newstatus });
+    });
+
+    $("#btmLOGOFF").on("click", () => {
+      onLogOff = true;
+      cws.onClose();
+      goToLogIn()
+    });
+
+    $("#btmMANUALCALL").on("click", async function () {
+      await cws.getManualCampaigns()
+        .then(resp => {
+          if (resp.length > 0) {
+            funcManualCall(resp)
+          } else {
+            log("x", 'You cannot make a Call. You need to log into a manual campaign');
+          }
+        })
+        .catch(err => {
+          log("x", 'Manual Campaigns There are not campaigns');
+        });
+    });
+
+    $("#btmHOLD").on("click", async function () {
+      cws.funcHold();
+    });
+    $("#btmRETREIVE").on("click", function () {
+      cws.funcHold();
+    })
+    $("#btmTRANSFER").on("click", function () {
+      funcTransf();
+    });
+
+
+    $("#btmSENDDTMF").on("click", function () {
+      let html;
+      html = `
+          <div class="text-center mb-3">
+              <h4>Manual Call</h4>
+              <div class="form-group">
+                  <label>Send DMTF</label>
+              </div>
+              <div class="form-group">
+                  <label>Please enter a DTMF [0-9][*][#]</label>
+                  <input type="text" id="senddtmf"  class="form-control" placeholder="Enter a DTMF"/>
+              </div>
+              <button id="btmDTMFSend" class="btn btn-success m-1">Send</button>
+              <button id="btmDTMFCancel" class="btn btn-danger m-1">Cancel</button>
+          </div>
+      `;
+      $("#question").html(html);
+
+
+      $("#question").removeClass("hide");
+      $("#btmDTMFSend").on("click", function () {
+        $("#question").addClass("hide");
+        let data = $("#senddtmf").val();
+        if (data == "") {
+          log("x", 'The DTMF is blank');
+          return;
+        };
+        cws.funcDTMF(data);
+      });
+      $("#btmDTMFCancel").on("click", function () {
+        $("#question").addClass("hide");
+      });
+
+    });
+
+
+    $("#btmBRIDGE").on("click", function () {
+      if (cws.activeCalls() == 2) {
+        let lines = [];
+        $(".checks").prop('checked', function () {
+          let id = $(this).attr('value');
+          lines.push(id);
+        });
+        cws.funcBridge(lines);
+      }
+    });
+
+    $("#btmCONF").on("click", function () {
+      cws.funcConference([1]);
+      cws.funcConference([1, 2]);
+    })
+    $("#btmDISCONNECT").on("click", function () {
+      cws.funcDisconnect();
+    })
+    $("#btmBREAK").on("click", function () {
+      cws.funcBreakConference();
+    })
+    $("#btmRECALL").on("click", function () {
+      cws.funcReCall();
+    })
+    $("#btmHANGUP").on("click", function () {
+      cws.funcHangUp();
+    })
+
+    function funcManualCall(resp) {
+      let html = "";
+      let subhtml = "";
+
+      resp.forEach(e => {
+        subhtml = `${subhtml}<option value='${e.camp_id}'>${e.camp_name}</option>`;
+      });
+
+      html = `
+          <div class="text-center mb-3">
+              <h4>Manual Call</h4>
+              <div class="form-group">
+                  <label>Select a Campaign</label>
+                  <select id="cmbCamp" class="form-control">${subhtml}</select>
+              </div>
+              <div class="form-group">
+                  <label>Enter a phone number</label>
+                  <input type="text" id="phonemanualcall"  class="form-control" placeholder="Enter a phone number" />
+              </div>
+              <button id="btmMMCall" class="btn btn-success m-1">Call</button>
+              <button id="btmMMCancel" class="btn btn-danger m-1">Cancel</button>
+          </div>
+      `;
+      $("#question").html(html);
+      $("#question").removeClass("hide");
+
+      $("#btmMMCall").on("click", function () {
+        $("#question").addClass("hide");
+
+        if ($("#phonemanualcall").val() == "") {
+          log("x", 'You cannot make a Call.ou must need to enter a phone number');
+          return;
+        };
+
+        let params = {
+          camp_id: parseInt($("#cmbCamp option:selected").val()),
+          phone: $("#phonemanualcall").val(),
+          type: "phone",
+          leadId: 0,
+        };
+        cws.onSend(cws.OUTCALL, params);
+      });
+      $("#btmMMCancel").on("click", function () {
+        $("#question").addClass("hide");
+      });
+    }
+
+    var table = $('#tblCallData tbody').on("click", "tr", function () {
+      let data = $(this)[0].outerText.split("\t");
+      cws.selectRow(data);
+    });
+
+    /** TRANSFER SECTION **/
+
+    async function funcTransf() {
+      this.transferCmpData = [];
+      this.transferAgentData = [];
+
+      let htmlAgent = "";
+      let whereTransfer = [];
+
+      await cws.getTransferAgentsData()
+        .then(resp => {
+          if (resp && resp.length > 0) {
+            this.transferAgentData = resp;
+            whereTransfer.push(cws.AGENT);
+          }
+          functTransferFindCmp(whereTransfer)
+        })
+        .catch(err => {
+          log("error", `Transfer Agent ${err}`);
+        });
+    };
+
+    async function functTransferFindCmp(whereTransfer) {
+      await cws.getTransferCampaignData()
+        .then(data => {
+          if (data && data.length > 0) {
+            this.transferCmpData = data;
+            whereTransfer.push(cws.CAMPAIGN);
+          }
+          if (whereTransfer.length == 0) {
+            this.funcTransferPhone();
+          } else {
+            this.functTransferWindow(whereTransfer);
+          }
+        })
+        .catch(err => {
+          let msg = `Transfer Campaign  ${err}.`;
+          log("error", msg);
+        });
+    }
+
+    async function functTransferWindow(whereTransfer) {
+      whereTransfer.push(cws.PHONE);
+      let htmlaux = "";
+      whereTransfer.forEach(e => {
+        htmlaux = `${htmlaux}<option value="${e}">${e}</option>`;
+      });
+      let html = '';
+      html = `
+        <div class="text-center mb-3">
+            <h4>Transfer</h4>
+            <label>Select a transfer type</label>
+            <select class="form-control" id="dropWhatTransfer">${htmlaux}</select>
+            <button id="btmTWCall" class="btn btn-success m-1">Select</button>
+            <button id="btmTWCancel" class="btn btn-danger m-1">Cancel</button>
+        </div>
+        `;
+      $("#question").html(html);
+      $("#question").removeClass("hide");
+
+      $("#btmTWCall").on("click", function () {
+        let option = $("#dropWhatTransfer option:selected").val();
+        $("#question").addClass("hide");
+        eval(`funcTransfer${option}()`);
+      });
+      $("#btmTWCancel").on("click", function () {
+        $("#question").addClass("hide");
+      });
+    }
+
+
+    function funcTransferAgent() {
+      let htmlaux = "";
+      this.transferAgentData.forEach((e) => {
+        htmlaux = `${htmlaux}<option value="${e.data}">${e.label}</option>`;
+      });
+
+      let html = "";
+      html = `
+          <div class="text-center mb-3">
+              <h4>Transfer Agents</h4>
+              <div class="form-group">
+                  <label>Please select an agent</label>
+                  <select class="form-control" id="dropWhatTransferAgent">${htmlaux}</select>
+              </div>
+              <button id="btmTaCall" class="btn btn-success m-1">Call</button>
+              <button id="btmTaCancel" class="btn btn-danger m-1">Cancel</button>
+          </div>
+      `;
+      $("#question").html(html);
+      $("#question").removeClass("hide");
+
+      $("#btmTaCall").on("click", function () {
+        let data = $("#dropWhatTransferAgent option:selected").val();
+        $("#question").addClass("hide");
+        cws.funcTransfer(cws.AGENT, data);
+      });
+      $("#btmTaCancel").on("click", function () {
+        $("#question").addClass("hide");
+      });
+    }
+    function funcTransferCampaign() {
+      let htmlaux = "";
+      this.transferCmpData.forEach((e) => {
+        htmlaux = `${htmlaux}<option value="${e.camp_id}">${e.camp_name}</option>`;
+      });
+
+      let html = "";
+      html = `
+          <div class="text-center mb-3">
+              <h4>Transfer Campaigns</h4>
+              <div class="form-group">
+                  <label>Please select a campaign</label>
+                  <select class="form-control" id="dropWhatTransferCmp">${htmlaux}</select>
+              </div>
+              <button id="btmTCCall" class="btn btn-success m-1">Call</button>
+              <button id="btmTCCancel" class="btn btn-danger m-1">Cancel</button>
+          </div>
+      `;
+      $("#question").html(html);
+      $("#question").removeClass("hide");
+
+      $("#btmTCCall").on("click", function () {
+        let data = $("#dropWhatTransferCmp option:selected").val();
+        $("#question").addClass("hide");
+        cws.funcTransfer(cws.CAMPAIGN, data);
+      });
+      $("#btmTCCancel").on("click", function () {
+        $("#question").addClass("hide");
+      });
+    }
+
+    function funcTransferPhone() {
+      let html = "";
+      html = `
+          <div class="text-center mb-3">
+              <h4>Transfer Number</h4>
+              <div class="form-group">
+                  <label>Enter a phone number</label>
+                  <input type="text" id="tranfer_phone"  class="form-control" placeholder="Enter a phone number" />
+              </div>
+              <button id="btmTransfCall" class="btn btn-success m-1">Call</button>
+              <button id="btmTransfCancel" class="btn btn-danger m-1">Cancel</button>
+          </div>
+      `;
+      $("#question").html(html);
+      $("#question").removeClass("hide");
+
+      $("#btmTransfCall").on("click", function () {
+        let data = $("#tranfer_phone").val();
+        cws.funcTransfer(cws.PHONE, data);
+        $("#question").addClass("hide");
+      });
+      $("#btmTransfCancel").on("click", function () {
+        $("#question").addClass("hide");
+      });
+    };
+
+    // $("#divOnlyForTest").load("http://localhost/toolscallevo/testcallevowebsocket/help.html");
+    $("#divOnlyForTest").load(`${pathLocal}help.html`);
+
+    $("#support").on("click", function () {
+      $("#bodyscript").removeClass("col-9");
+      $("#bodyscript").addClass("col-6");
+      $("#divOnlyForTest").removeClass("hide");
+    })
+  </script>
+</body>
+
+</html>
