@@ -101,7 +101,7 @@
   </div>
   
   <script language="javascript">
-    let pathLocal = "http://localhost/callevo/agentdev/";
+    let pathLocal = "http://localhost//core/examples/agent/";
     let cws = new CallEvoWebServices();
     let lstTenants = [];
     let lstCamps = [];
@@ -115,7 +115,7 @@
     let password = "";
     let user = {};
 
-    console.log(cws.versionSoftware);
+    if (cws.debug) console.log(cws.versionSoftware);
 
     $("#btmSignIn").on("click", (event) => {
       email = $("#email").val();
@@ -266,7 +266,8 @@
       sessionStorage.setItem("campaigns_register", cmpids.join(","));
       sessionStorage.setItem("statusLogged", "true");
       var miRedirect = document.createElement('a');
-      miRedirect.setAttribute('href', `${pathLocal}agent.html`);
+      // miRedirect.setAttribute('href', `${pathLocal}agent.html`);
+      miRedirect.setAttribute('href', `agent.html`);
       miRedirect.setAttribute('target', '_self');
       miRedirect.click();
     });
